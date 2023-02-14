@@ -4,11 +4,16 @@ from django.db import models
 
 class User(AbstractUser):
     """Кастомизированная модель пользователей."""
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
+
     email = models.EmailField(
         'Адрес электронной почты',
         max_length=254,
         blank=False,
         null=False,
+        unique=True,
         )
 
     subscriptions = models.ManyToManyField(
@@ -17,6 +22,3 @@ class User(AbstractUser):
         symmetrical=False,
         verbose_name='Подписки',
     )
-
-    def get_is_subscribed(self, obj):
-        return self.context['user'] in obj.followers.all()

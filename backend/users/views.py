@@ -1,12 +1,8 @@
-from django.contrib.auth import get_user_model
 from djoser.views import UserViewSet
-
-from .serializers import CustomUserSerializer
-
-User = get_user_model
+from rest_framework.pagination import LimitOffsetPagination
 
 
-class CustomUserViewSet(UserViewSet):
-    """Вьюсет для пользователя."""
-    queryset = User.objects.all()
-    serializer_class = CustomUserSerializer
+class UserViewSet(UserViewSet):
+    """Вьюсет для пользователей с пагинацией."""
+
+    pagination_class = LimitOffsetPagination

@@ -1,8 +1,11 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from foodgram.models import Ingredients, Tag
+from foodgram.models import Ingredients, Recipes, Tag
 from rest_framework import filters, mixins, viewsets
+from rest_framework.pagination import LimitOffsetPagination
 
-from .serializers import IngredientSerializer, TagSerializer
+from .filters import RecipeFilter
+from .serializers import (IngredientSerializer, RecipeCreateSerializer,
+                          RecipeGetSerializer, TagSerializer)
 
 
 class TagViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -19,3 +22,19 @@ class IngredientsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = IngredientSerializer
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     search_field = ('^name',)
+
+
+class RecipeViewSet(viewsets.ModelViewSet):
+    """Вьюсет для рецептов."""
+
+    queryset = Recipes.objects.all()
+    pagination_class = LimitOffsetPagination
+    filterset_class = RecipeFilter
+    filterset_fields = ('author', 'tags', 'favorited', 'in_shopping_cart',)
+
+    def get_serializer_class(self):
+        """Выбор сериализатора для рецептов."""
+
+        if self.action in ['list', 'retrieve']:
+            return RecipeGetSerializer
+        return RecipeCreateSerializer
