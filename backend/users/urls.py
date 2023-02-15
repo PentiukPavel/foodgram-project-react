@@ -5,10 +5,13 @@ from . import views
 
 router = DefaultRouter()
 
-router.register(r'users', views.UserViewSet, basename='tags')
+router.register('users',
+                views.CustomUserView,
+                basename='users')
 
 
 urlpatterns = [
+    path('', include(router.urls)),
     path('', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
 ]
