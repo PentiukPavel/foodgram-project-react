@@ -19,8 +19,8 @@ class Command(BaseCommand):
             ),
             encoding='utf-8'
         ) as data:
-            for line in csv.DictReader(data):
-                i = {}
-                for key, value in line.items():
-                    i[key] = value
-                Ingredients.objects.create(**i)
+            for line in csv.reader(data):
+                Ingredients.objects.create(
+                    name=line[0],
+                    measurement_unit=line[1]
+                )

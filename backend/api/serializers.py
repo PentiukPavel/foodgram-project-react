@@ -3,7 +3,7 @@ import base64
 from django.core.files.base import ContentFile
 from foodgram.models import Ingredients, RecipeIngredient, Recipes, Tag
 from rest_framework import serializers
-from users.serializers import UserSerializer
+from users.serializers import CustomUserSerializer
 
 
 class Base64ImageField(serializers.ImageField):
@@ -39,14 +39,14 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RecipeIngredient
-        fields = ('id', 'amount',)
+        fields = ('id', 'amount')
 
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
     """Сериализатор для создания рецепта."""
 
-    tags = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    ingredients = RecipeIngredientSerializer(many=True, read_only=True)
+    tags = serializers.PrimaryKeyRelatedField(many=True, read_omly=True)
+    ingredients = RecipeIngredientSerializer(many=True, read_omly=True)
     image = Base64ImageField(required=True, allow_null=False)
 
     class Meta:
@@ -73,7 +73,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 class RecipeGetSerializer(serializers.ModelSerializer):
     """Сериализатор для получения рецептов."""
 
-    author = UserSerializer(read_only=True)
+    author = CustomUserSerializer(read_only=True)
     image = Base64ImageField(required=True, allow_null=False)
     tags = TagSerializer(many=True, read_only=True)
     ingredients = IngredientSerializer(many=True, read_only=True)
@@ -84,7 +84,7 @@ class RecipeGetSerializer(serializers.ModelSerializer):
         model = Recipes
         fields = ('id',
                   'tags',
-                  'auhor',
+                  'author',
                   'ingredients',
                   'is_favorited',
                   'is_in_shopping_cart',
@@ -94,7 +94,16 @@ class RecipeGetSerializer(serializers.ModelSerializer):
                   'cooking_time',)
 
     def get_is_in_shopping_cart(self, obj):
-        return self.context['user'] in obj.in_shopping_cart.all()
+        return self.context.get('request').user in obj.in_shopping_cart.all()
 
     def get_is_favorited(self, obj):
-        return self.context['user'] in obj.favorited.all()
+        return self.context.get('request').user in obj.favorited.all()
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        ingredients = representation['ingredients']
+        for ingredient in ingredients:
+            amount = RecipeIngredient.objects.get(ingredient=ingredient['id'],
+                                                  recipe=instance).amount
+            ingredient['amount'] = amount
+        return representation
