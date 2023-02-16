@@ -85,10 +85,12 @@ class Recipes(models.Model):
         through='RecipeTag',
         help_text='Список тегов',
         verbose_name='Теги',
+        related_name='recipes',
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
+        related_name='recipes',
         verbose_name='Автор',
         help_text='Автор рецепта',
     )
@@ -97,6 +99,7 @@ class Recipes(models.Model):
         through='RecipeIngredient',
         help_text='Список ингредиентов',
         verbose_name='Ингредиенты',
+        related_name='recipes',
     )
     cooking_time = models.PositiveIntegerField(
         'Время приготовления',

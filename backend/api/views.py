@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
 from foodgram.models import Ingredients, Recipes, Tag
 from rest_framework import filters, mixins, viewsets
@@ -5,7 +6,9 @@ from rest_framework.pagination import LimitOffsetPagination
 
 from .filters import RecipeFilter
 from .serializers import (IngredientSerializer, RecipeCreateSerializer,
-                          RecipeGetSerializer, TagSerializer)
+                          RecipeGetSerializer, TagSerializer,)
+
+User = get_user_model()
 
 
 class TagViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):

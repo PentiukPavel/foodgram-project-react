@@ -1,13 +1,16 @@
 import base64
 
+from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from foodgram.models import Ingredients, RecipeIngredient, Recipes, Tag
 from rest_framework import serializers
 from users.serializers import CustomUserSerializer
 
+User = get_user_model()
+
 
 class Base64ImageField(serializers.ImageField):
-    """Сеириализатор для фотографий блюд."""
+    """Сериализатор для фотографий блюд."""
 
     def to_internal_value(self, data):
         if isinstance(data, str) and data.startswith('data:image'):
@@ -68,6 +71,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             RecipeIngredient.objects.create(current_ingredient,
                                             recipe=recipe,
                                             amount=ingredients['amount'])
+        return recipe
 
 
 class RecipeGetSerializer(serializers.ModelSerializer):
@@ -107,3 +111,16 @@ class RecipeGetSerializer(serializers.ModelSerializer):
                                                   recipe=instance).amount
             ingredient['amount'] = amount
         return representation
+
+
+class RecipeForSubscriptionsSerializer(serializers.ModelSerializer):
+    """Сериализатор для рецептов в подписках."""
+
+    image = Base64ImageField(required=True, allow_null=False)
+
+    class Meta:
+        model = Recipes
+        fields = ('id',
+                  'name',
+                  'image',
+                  'cooking_time',)
