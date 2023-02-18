@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from django.db.models import Count
 
 from .models import Ingredients, RecipeIngredient, Recipes, RecipeTag, Tag
 
@@ -52,11 +51,13 @@ class RecipesAdmin(admin.ModelAdmin):
               'text',
               'cooking_time',
               'favorited',
-              'in_shopping_cart',)
+              'in_shopping_cart',
+              'in_favorites')
+    readonly_fields = ['in_favorites', ]
 
-    def in_favorited(self, obj):
+    def in_favorites(self, obj):
         """Количество добавлений в избранное."""
-        return obj.favorited
+        return obj.favorited.count()
 
 
 admin.site.register(Ingredients, IngredientsAdmin)

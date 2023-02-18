@@ -123,17 +123,24 @@ class Recipes(models.Model):
     favorited = models.ManyToManyField(
         User,
         related_name='favorites',
-        verbose_name='В избранном',
+        verbose_name='В избранном у',
+        blank=True,
     )
     in_shopping_cart = models.ManyToManyField(
         User,
         related_name='shopping_cart',
-        verbose_name='В листе покупок',
+        verbose_name='В листе покупок у',
+        blank=True,
+    )
+    pub_date = models.DateTimeField(
+        'Даnа публикации',
+        auto_now_add=True,
     )
 
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
+        ordering = ('-pub_date',)
 
     def __str__(self):
         return self.name
