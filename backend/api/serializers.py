@@ -101,6 +101,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             RecipeIngredient.objects.create(ingredient=current_ingredient,
                                             recipe=recipe,
                                             amount=ingredient['amount'],)
+
         return recipe
 
     def update(self, instance, validated_data):
@@ -123,7 +124,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                                             recipe=recipe,
                                             amount=ingredient['amount'],)
         instance.save()
-        return recipe
+
 
 
 class RecipeGetSerializer(serializers.ModelSerializer):
@@ -190,6 +191,7 @@ class SubscribeGetSerializer(serializers.ModelSerializer):
     recipes = RecipeForSubscriptionsSerializer(many=True,
                                                read_only=True)
 
+
     class Meta:
         model = User
         fields = (
@@ -220,3 +222,4 @@ class SubscribeGetSerializer(serializers.ModelSerializer):
             User,
             id=obj.id)
         return user.recipes.count()
+
