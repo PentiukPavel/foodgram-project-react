@@ -5,6 +5,12 @@ from django.db import models
 class User(AbstractUser):
     """Кастомизированная модель пользователей."""
 
+    USER = 'user'
+
+    ROLE_CHOISES = (
+        (USER, 'пользователь'),
+    )
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
@@ -21,4 +27,18 @@ class User(AbstractUser):
         related_name='followers',
         symmetrical=False,
         verbose_name='Подписки',
+        blank=True,
     )
+
+    role = models.CharField(
+        'Роль пользователя',
+        max_length=13,
+        choices=ROLE_CHOISES,
+        default=USER,
+        blank=False,
+        null=False,
+    )
+
+    @property
+    def is_user(self):
+        return self.role == User.USER

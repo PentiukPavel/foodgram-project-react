@@ -2,9 +2,10 @@ import base64
 
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
+from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from foodgram.models import (Ingredients, RecipeIngredient,
-                             Recipes, RecipeTag, Tag)
+from foodgram.models import (Ingredients, RecipeIngredient, Recipes, RecipeTag,
+                             Tag)
 from rest_framework import serializers
 
 User = get_user_model()
@@ -100,7 +101,30 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             RecipeIngredient.objects.create(ingredient=current_ingredient,
                                             recipe=recipe,
                                             amount=ingredient['amount'],)
+
         return recipe
+
+    def update(self, instance, validated_data):
+        instance.image = validated_data.get('image', instance.image)
+        instance.name = validated_data.get('name', instance.name)
+        instance.text = validated_data.get('text', instance.text)
+        instance.cooking_time = validated_data.get('cooking_time',
+                                                   instance.cooking_time)
+        instance.tags.clear()
+        instance.ingredients.clear()
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients')
+        recipe = instance
+        for tag in tags:
+            RecipeTag.objects.create(tag=tag,
+                                     recipe=recipe)
+        for ingredient in ingredients:
+            current_ingredient = Ingredients.objects.get(pk=ingredient['id'])
+            RecipeIngredient.objects.create(ingredient=current_ingredient,
+                                            recipe=recipe,
+                                            amount=ingredient['amount'],)
+        instance.save()
+
 
 
 class RecipeGetSerializer(serializers.ModelSerializer):
@@ -127,9 +151,13 @@ class RecipeGetSerializer(serializers.ModelSerializer):
                   'cooking_time',)
 
     def get_is_in_shopping_cart(self, obj):
+        """Рецепт в списке покупок у пользователя."""
+
         return self.context.get('request').user in obj.in_shopping_cart.all()
 
     def get_is_favorited(self, obj):
+        """Рецепт в избраном у пользователя."""
+
         return self.context.get('request').user in obj.favorited.all()
 
     def to_representation(self, instance):
@@ -155,38 +183,14 @@ class RecipeForSubscriptionsSerializer(serializers.ModelSerializer):
                   'cooking_time',)
 
 
-class SubscribePostDeleteSerializer(serializers.ModelSerializer):
-    """Сериализатор для создания и удалений подписки."""
-
-    class Meta:
-        model = User
-        fields = ('subscriptions',)
-
-    def to_representation(self, instance):
-        """Вид данных сериализатора."""
-        representation = super().to_representation(instance)
-        subscriptions = representation['subscriptions']
-        return {
-            'id': subscriptions
-        }
-
-    def id_validate(self, value):
-        """Проверка на подписку на самого себя."""
-        if self.context['request'].user == value['id']:
-            raise serializers.ValidationError(
-                'Нельзя пописываться на самого себя.'
-            )
-        return value
-
-
 class SubscribeGetSerializer(serializers.ModelSerializer):
     """Сериализатор для получения подписок."""
 
     is_subscribed = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
     recipes = RecipeForSubscriptionsSerializer(many=True,
-                                               read_only=True,
-                                               source='user.recipes',)
+                                               read_only=True)
+
 
     class Meta:
         model = User
@@ -201,7 +205,21 @@ class SubscribeGetSerializer(serializers.ModelSerializer):
         )
 
     def get_is_subscribed(self, obj):
+        """Отметка о подписке на автора."""
+
         return self.context.get('request').user in obj.followers.all()
 
+    def get_recipes(self, obj):
+        """Получение рецептов автора."""
+
+        recipes = obj.recipes.all()
+        return RecipeForSubscriptionsSerializer(recipes, many=True)
+
     def get_recipes_count(self, obj):
-        return self.recipes.count()
+        """Подсчет количества рецептов автора."""
+
+        user = get_object_or_404(
+            User,
+            id=obj.id)
+        return user.recipes.count()
+
