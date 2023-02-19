@@ -143,10 +143,7 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
                     recipe=recipe
                 ).amount
                 key = f'{ ingredient.name } ({ ingredient.measurement_unit })'
-                if key in ingredients:
-                    ingredients[key] += amount
-                else:
-                    ingredients[key] = amount
+                ingredients[key] = ingredients.get(key, 0) + amount
         result = []
         for ingredient, amount in ingredients.items():
             result.append(f'{ingredient} - {amount} {line_break}')

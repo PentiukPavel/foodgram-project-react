@@ -62,13 +62,14 @@ class IngredientSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'measurement_unit',)
 
 
-class RecipeIngredientSerializer(serializers.Serializer):
+class RecipeIngredientSerializer(serializers.ModelSerializer):
     """Сериализатор для связи рецептов и ингредиентов."""
 
-    id = serializers.IntegerField(write_only=True)
+    id = serializers.PrimaryKeyRelatedField(queryset=Ingredients.objects.all())
     amount = serializers.IntegerField(write_only=True)
 
     class Meta:
+        model = RecipeIngredient
         fields = ('id', 'amount',)
 
 
@@ -93,12 +94,11 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
         recipe = Recipes.objects.create(**validated_data)
-        for tag in tags:
-            RecipeTag.objects.create(tag=tag,
-                                     recipe=recipe)
+        RecipeTag.objects.bulk_create(
+            [RecipeTag(tag=tag, recipe=recipe) for tag in tags]
+        )
         for ingredient in ingredients:
-            current_ingredient = Ingredients.objects.get(pk=ingredient['id'])
-            RecipeIngredient.objects.create(ingredient=current_ingredient,
+            RecipeIngredient.objects.create(ingredient=ingredient['id'],
                                             recipe=recipe,
                                             amount=ingredient['amount'],)
         return recipe
@@ -118,8 +118,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             RecipeTag.objects.create(tag=tag,
                                      recipe=recipe)
         for ingredient in ingredients:
-            current_ingredient = Ingredients.objects.get(pk=ingredient['id'])
-            RecipeIngredient.objects.create(ingredient=current_ingredient,
+            RecipeIngredient.objects.create(ingredient=ingredient['id'],
                                             recipe=recipe,
                                             amount=ingredient['amount'],)
         instance.save()

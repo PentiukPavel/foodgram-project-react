@@ -7,7 +7,7 @@ from foodgram.models import Ingredients
 
 
 class Command(BaseCommand):
-    help = 'Импорт ингредиентов из файл csv.'
+    help = 'Импорт ингредиентов из csv файла.'
 
     def handle(self, *args, **kwargs):
         with open(
@@ -19,8 +19,9 @@ class Command(BaseCommand):
             ),
             encoding='utf-8'
         ) as data:
-            for line in csv.reader(data):
-                Ingredients.objects.create(
+            Ingredients.objects.bulk_create(
+                [Ingredients(
                     name=line[0],
                     measurement_unit=line[1]
-                )
+                ) for line in csv.reader(data)]
+            )
