@@ -3,7 +3,7 @@ import os
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from foodgram.models import Ingredients
+from foodgram.models import Ingredient
 
 
 class Command(BaseCommand):
@@ -19,8 +19,8 @@ class Command(BaseCommand):
             ),
             encoding='utf-8'
         ) as data:
-            Ingredients.objects.bulk_create(
-                [Ingredients(
+            Ingredient.objects.bulk_create(
+                [Ingredient(
                     name=line[0],
                     measurement_unit=line[1]
                 ) for line in csv.reader(data)]

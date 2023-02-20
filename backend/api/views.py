@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from foodgram.models import Ingredients, Recipes, Tag
+from foodgram.models import Ingredient, Recipe, Tag
 from rest_framework import filters, mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
@@ -11,10 +12,11 @@ from rest_framework.response import Response
 
 from .filters import RecipeFilter
 from .permissions import AdminAuthorOrReadOnly
-from .serializers import (IngredientSerializer, RecipeCreateSerializer,
+from .serializers import (CustomUserSerializer, IngredientSerializer,
+                          RecipeCreateSerializer,
                           RecipeForSubscriptionsSerializer,
                           RecipeGetSerializer, SubscribeGetSerializer,
-                          TagSerializer, UserSerializer)
+                          TagSerializer)
 
 User = get_user_model()
 
@@ -29,7 +31,7 @@ class TagViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 class IngredientsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     """Вьюсет для ингредиентов."""
 
-    queryset = Ingredients.objects.all()
+    queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     search_field = ('^name',)
@@ -54,12 +56,9 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
         return RecipeCreateSerializer
 
     def get_queryset(self):
-        return Recipes.objects.all()
+        return Recipe.objects.all()
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-
-    def perform_update(self, serializer):
         serializer.save(author=self.request.user)
 
     @action(
@@ -77,7 +76,7 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
         и удаление из него.
         """
 
-        recipe = Recipes.objects.get(id=kwargs['pk'])
+        recipe = get_object_or_404(Recipe, id=kwargs['pk'])
         user = self.request.user
         if request.method == 'POST':
             if recipe.favorited.filter(pk=user.id).exists():
@@ -106,7 +105,7 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
         и удаление из него.
         """
 
-        recipe = Recipes.objects.get(id=kwargs['pk'])
+        recipe = get_object_or_404(Recipe, id=kwargs['pk'])
         user = self.request.user
         if request.method == 'POST':
             if recipe.in_shopping_cart.filter(pk=user.id).exists():
@@ -159,7 +158,7 @@ class CustomUserView(UserViewSet):
 
     queryset = User.objects.all()
     pagination_class = LimitOffsetPagination
-    serializer_class = UserSerializer
+    serializer_class = CustomUserSerializer
 
     @action(
         detail=True,
@@ -177,6 +176,8 @@ class CustomUserView(UserViewSet):
         author = User.objects.get(id=kwargs['id'])
         user = self.request.user
         if request.method == 'POST':
+            if author == user:
+                return Response({'errors': 'Нельзя подписаться на себя.'})
             if user.subscriptions.filter(pk=author.id).exists():
                 return Response({'errors': 'Вы уже подписаны на автора.'})
             user.subscriptions.add(author)
