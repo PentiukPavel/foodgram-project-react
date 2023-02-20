@@ -1,11 +1,11 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from foodgram.models import (Ingredient, Recipe, RecipeIngredient, RecipeTag,
-                             Tag)
+from foodgram.models import Ingredient, Recipe, RecipeIngredient, Tag
 from rest_framework import serializers
 
 from .fields import Base64ImageField
+from .serializers_utils import tags_and_ingredients_create
 
 User = get_user_model()
 
@@ -97,13 +97,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(**validated_data)
-        RecipeTag.objects.bulk_create(
-            [RecipeTag(tag=tag, recipe=recipe) for tag in tags]
-        )
-        for ingredient in ingredients:
-            RecipeIngredient.objects.create(ingredient=ingredient['id'],
-                                            recipe=recipe,
-                                            amount=ingredient['amount'],)
+        tags_and_ingredients_create(tags, ingredients, recipe)
         return recipe
 
     def update(self, instance, validated_data):
@@ -111,14 +105,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         instance.ingredients.clear()
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
-        for tag in tags:
-            RecipeTag.objects.create(tag=tag,
-                                     recipe=instance)
-        for ingredient in ingredients:
-            RecipeIngredient.objects.create(ingredient=ingredient['id'],
-                                            recipe=instance,
-                                            amount=ingredient['amount'],)
-        instance.save()
+        tags_and_ingredients_create(tags, ingredients, instance)
         return super().update(instance, validated_data)
 
 

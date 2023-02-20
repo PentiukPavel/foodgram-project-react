@@ -14,7 +14,7 @@ from .permissions import AdminAuthorOrReadOnly
 from .serializers import (CustomUserSerializer, IngredientSerializer,
                           RecipeCreateSerializer, RecipeGetSerializer,
                           SubscribeGetSerializer, TagSerializer)
-from .utils import add_to_field
+from .views_utils import add_to_field
 
 User = get_user_model()
 
