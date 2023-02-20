@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from foodgram.models import Ingredient, Recipe, Tag
+from foodgram.models import Ingredient, Recipe, RecipeIngredient, Tag
 from rest_framework import filters, mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
@@ -118,15 +118,13 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
         recipes = user.shopping_cart.all()
         ingredients = {}
         line_break = '\n'
-        for recipe in recipes:
-            recipe_ingredients = recipe.ingredients.all()
-            for ingredient in recipe_ingredients:
-                amount = ingredient.recipeingredient_set.get(
-                    ingredient=ingredient,
-                    recipe=recipe
-                ).amount
-                key = f'{ ingredient.name } ({ ingredient.measurement_unit })'
-                ingredients[key] = ingredients.get(key, 0) + amount
+        recipe_ingredients = RecipeIngredient.objects.filter(
+            recipe__in=recipes
+        )
+        for ingredient in recipe_ingredients:
+            key = (f'{ ingredient.ingredient.name }'
+                   f'({ ingredient.ingredient.measurement_unit })')
+            ingredients[key] = ingredients.get(key, 0) + ingredient.amount
         result = []
         for ingredient, amount in ingredients.items():
             result.append(f'{ingredient} - {amount} {line_break}')
