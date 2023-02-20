@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from foodgram.models import Ingredient, Recipe, Tag
@@ -13,10 +12,9 @@ from rest_framework.response import Response
 from .filters import RecipeFilter
 from .permissions import AdminAuthorOrReadOnly
 from .serializers import (CustomUserSerializer, IngredientSerializer,
-                          RecipeCreateSerializer,
-                          RecipeForSubscriptionsSerializer,
-                          RecipeGetSerializer, SubscribeGetSerializer,
-                          TagSerializer)
+                          RecipeCreateSerializer, RecipeGetSerializer,
+                          SubscribeGetSerializer, TagSerializer)
+from .utils import add_to_field
 
 User = get_user_model()
 
@@ -76,19 +74,12 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
         и удаление из него.
         """
 
-        recipe = get_object_or_404(Recipe, id=kwargs['pk'])
-        user = self.request.user
-        if request.method == 'POST':
-            if recipe.favorited.filter(pk=user.id).exists():
-                return Response({'errors': 'Рецепт уже в избранном.'})
-            recipe.favorited.add(user)
-        if request.method == 'DELETE':
-            if recipe.favorited.filter(pk=user.id).exists():
-                recipe.favorited.remove(user)
-            else:
-                return Response({'errors': 'Рецепта нет в избранном.'})
-        serializer = RecipeForSubscriptionsSerializer(recipe)
-        return Response(serializer.data)
+        response = add_to_field(self,
+                                request,
+                                field_name='favorited',
+                                message='избранном',
+                                **kwargs)
+        return Response(response.data)
 
     @action(
         detail=True,
@@ -105,19 +96,12 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
         и удаление из него.
         """
 
-        recipe = get_object_or_404(Recipe, id=kwargs['pk'])
-        user = self.request.user
-        if request.method == 'POST':
-            if recipe.in_shopping_cart.filter(pk=user.id).exists():
-                return Response({'errors': 'Рецепт уже в списке покупок.'})
-            recipe.in_shopping_cart.add(user)
-        if request.method == 'DELETE':
-            if recipe.in_shopping_cart.filter(pk=user.id).exists():
-                recipe.in_shopping_cart.remove(user)
-            else:
-                return Response({'errors': 'Рецепта нет в списке покупок.'})
-        serializer = RecipeForSubscriptionsSerializer(recipe)
-        return Response(serializer.data)
+        response = add_to_field(self,
+                                request,
+                                field_name='in_shopping_cart',
+                                message='списке покупок',
+                                **kwargs)
+        return Response(response.data)
 
     @action(
         detail=False,
