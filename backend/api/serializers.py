@@ -109,13 +109,36 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
+class RicepiIngredientPostSerializer(serializers.ModelSerializer):
+    """Сериализатор для получения ингредиентов рецепта и их количества."""
+
+    name = serializers.SerializerMethodField()
+    id = serializers.SerializerMethodField()
+    measurement_unit = serializers.SerializerMethodField()
+
+    class Meta:
+        model = RecipeIngredient
+        fields = ('id', 'amount', 'name', 'measurement_unit')
+
+    def get_name(self, obj):
+        return obj.ingredient.name
+
+    def get_measurement_unit(self, obj):
+        return obj.ingredient.measurement_unit
+
+    def get_id(self, obj):
+        return obj.ingredient.id
+
+
 class RecipeGetSerializer(serializers.ModelSerializer):
     """Сериализатор для получения рецептов."""
 
     author = CustomUserSerializer(read_only=True)
     image = Base64ImageField(required=True, allow_null=False)
     tags = TagSerializer(many=True, read_only=True)
-    ingredients = IngredientSerializer(many=True, read_only=True)
+    ingredients = RicepiIngredientPostSerializer(
+        source='recipeingredient_set.all', many=True, read_only=True
+    )
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
@@ -143,15 +166,6 @@ class RecipeGetSerializer(serializers.ModelSerializer):
 
         user = self.context.get('request').user
         return Recipe.objects.filter(id=obj.id, favorited=user).exists()
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        ingredients = representation['ingredients']
-        for ingredient in ingredients:
-            amount = RecipeIngredient.objects.get(ingredient=ingredient['id'],
-                                                  recipe=instance).amount
-            ingredient['amount'] = amount
-        return representation
 
 
 class RecipeForSubscriptionsSerializer(serializers.ModelSerializer):
