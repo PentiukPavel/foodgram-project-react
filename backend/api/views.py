@@ -132,7 +132,6 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
             result.append(
                 f'{ name } - { maesurement_unit } { amount } { line_break }'
             )
-
         return HttpResponse(result, headers={
             'Content-Type': 'text/plain',
             'Content-Disposition': 'attachment; filename="cart.txt"',
