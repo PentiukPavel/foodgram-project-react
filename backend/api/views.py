@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Sum
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from foodgram.models import Ingredient, Recipe, RecipeIngredient, Tag
+from foodgram.models import Ingredient, Recipe, Tag
 from rest_framework import filters, mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
@@ -116,18 +117,20 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
 
         user = self.request.user
         recipes = user.shopping_cart.all()
-        ingredients = {}
         line_break = '\n'
-        recipe_ingredients = RecipeIngredient.objects.filter(
-            recipe__in=recipes
-        )
-        for ingredient in recipe_ingredients:
-            key = (f'{ ingredient.ingredient.name }'
-                   f'({ ingredient.ingredient.measurement_unit })')
-            ingredients[key] = ingredients.get(key, 0) + ingredient.amount
+        ings = Ingredient.objects.filter(recipeingredient__recipe__in=recipes)
+        ing_values = ings.values(
+            'name',
+            'measurement_unit').annotate(
+                amount=Sum('recipeingredient__amount'))
         result = []
-        for ingredient, amount in ingredients.items():
-            result.append(f'{ingredient} - {amount} {line_break}')
+        for value in ing_values:
+            name = value['name']
+            maesurement_unit = value['measurement_unit']
+            amount = value['amount']
+            result.append(
+                f'{ name } - { maesurement_unit } { amount } { line_break }'
+            )
 
         return HttpResponse(result, headers={
             'Content-Type': 'text/plain',
