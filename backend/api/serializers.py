@@ -98,6 +98,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         ingredients = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(**validated_data)
         tags_and_ingredients_create(tags, ingredients, recipe)
+
         return recipe
 
     def update(self, instance, validated_data):
@@ -105,6 +106,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         instance.ingredients.clear()
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
+
         tags_and_ingredients_create(tags, ingredients, instance)
         return super().update(instance, validated_data)
 
@@ -175,6 +177,7 @@ class SubscribeGetSerializer(serializers.ModelSerializer):
     recipes = RecipeForSubscriptionsSerializer(many=True,
                                                read_only=True)
 
+
     class Meta:
         model = User
         fields = (
@@ -206,3 +209,4 @@ class SubscribeGetSerializer(serializers.ModelSerializer):
             User,
             id=obj.id)
         return user.recipes.count()
+

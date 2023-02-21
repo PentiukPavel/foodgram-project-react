@@ -41,6 +41,7 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
                     mixins.UpdateModelMixin, viewsets.GenericViewSet):
     """Вьюсет для рецептов."""
 
+
     permission_classes = (AdminAuthorOrReadOnly, )
     pagination_class = LimitOffsetPagination
     filterset_class = RecipeFilter
