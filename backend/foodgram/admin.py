@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 
-from .models import Ingredients, RecipeIngredient, Recipes, RecipeTag, Tag
+from .models import Ingredient, Recipe, RecipeIngredient, RecipeTag, Tag
 
 User = get_user_model()
 
@@ -60,9 +60,9 @@ class RecipesAdmin(admin.ModelAdmin):
         return obj.favorited.count()
 
 
-admin.site.register(Ingredients, IngredientsAdmin)
+admin.site.register(Ingredient, IngredientsAdmin)
 admin.site.register(RecipeIngredient)
-admin.site.register(Recipes, RecipesAdmin)
+admin.site.register(Recipe, RecipesAdmin)
 admin.site.register(RecipeTag)
 admin.site.register(Tag)
 admin.site.register(User, UserAdmin)

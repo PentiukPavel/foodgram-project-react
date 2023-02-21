@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Sum
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from foodgram.models import Ingredients, Recipes, Tag
+from foodgram.models import Ingredient, Recipe, Tag
 from rest_framework import filters, mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
@@ -11,10 +12,10 @@ from rest_framework.response import Response
 
 from .filters import RecipeFilter
 from .permissions import AdminAuthorOrReadOnly
-from .serializers import (IngredientSerializer, RecipeCreateSerializer,
-                          RecipeForSubscriptionsSerializer,
-                          RecipeGetSerializer, SubscribeGetSerializer,
-                          TagSerializer, UserSerializer)
+from .serializers import (CustomUserSerializer, IngredientSerializer,
+                          RecipeCreateSerializer, RecipeGetSerializer,
+                          SubscribeGetSerializer, TagSerializer)
+from .views_utils import add_to_field
 
 User = get_user_model()
 
@@ -29,7 +30,7 @@ class TagViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 class IngredientsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     """Вьюсет для ингредиентов."""
 
-    queryset = Ingredients.objects.all()
+    queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     search_field = ('^name',)
@@ -55,12 +56,9 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
         return RecipeCreateSerializer
 
     def get_queryset(self):
-        return Recipes.objects.all()
+        return Recipe.objects.all()
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-
-    def perform_update(self, serializer):
         serializer.save(author=self.request.user)
 
     @action(
@@ -78,19 +76,12 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
         и удаление из него.
         """
 
-        recipe = Recipes.objects.get(id=kwargs['pk'])
-        user = self.request.user
-        if request.method == 'POST':
-            if recipe.favorited.filter(pk=user.id).exists():
-                return Response({'errors': 'Рецепт уже в избранном.'})
-            recipe.favorited.add(user)
-        if request.method == 'DELETE':
-            if recipe.favorited.filter(pk=user.id).exists():
-                recipe.favorited.remove(user)
-            else:
-                return Response({'errors': 'Рецепта нет в избранном.'})
-        serializer = RecipeForSubscriptionsSerializer(recipe)
-        return Response(serializer.data)
+        response = add_to_field(self,
+                                request,
+                                field_name='favorited',
+                                message='избранном',
+                                **kwargs)
+        return Response(response.data)
 
     @action(
         detail=True,
@@ -107,19 +98,12 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
         и удаление из него.
         """
 
-        recipe = Recipes.objects.get(id=kwargs['pk'])
-        user = self.request.user
-        if request.method == 'POST':
-            if recipe.in_shopping_cart.filter(pk=user.id).exists():
-                return Response({'errors': 'Рецепт уже в списке покупок.'})
-            recipe.in_shopping_cart.add(user)
-        if request.method == 'DELETE':
-            if recipe.in_shopping_cart.filter(pk=user.id).exists():
-                recipe.in_shopping_cart.remove(user)
-            else:
-                return Response({'errors': 'Рецепта нет в списке покупок.'})
-        serializer = RecipeForSubscriptionsSerializer(recipe)
-        return Response(serializer.data)
+        response = add_to_field(self,
+                                request,
+                                field_name='in_shopping_cart',
+                                message='списке покупок',
+                                **kwargs)
+        return Response(response.data)
 
     @action(
         detail=False,
@@ -134,23 +118,20 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
 
         user = self.request.user
         recipes = user.shopping_cart.all()
-        ingredients = {}
         line_break = '\n'
-        for recipe in recipes:
-            recipe_ingredients = recipe.ingredients.all()
-            for ingredient in recipe_ingredients:
-                amount = ingredient.recipeingredient_set.get(
-                    ingredient=ingredient,
-                    recipe=recipe
-                ).amount
-                key = f'{ ingredient.name } ({ ingredient.measurement_unit })'
-                if key in ingredients:
-                    ingredients[key] += amount
-                else:
-                    ingredients[key] = amount
+        ings = Ingredient.objects.filter(recipeingredient__recipe__in=recipes)
+        ing_values = ings.values(
+            'name',
+            'measurement_unit').annotate(
+                amount=Sum('recipeingredient__amount'))
         result = []
-        for ingredient, amount in ingredients.items():
-            result.append(f'{ingredient} - {amount} {line_break}')
+        for value in ing_values:
+            name = value['name']
+            maesurement_unit = value['measurement_unit']
+            amount = value['amount']
+            result.append(
+                f'{ name } - { maesurement_unit } { amount } { line_break }'
+            )
 
         return HttpResponse(result, headers={
             'Content-Type': 'text/plain',
@@ -163,7 +144,7 @@ class CustomUserView(UserViewSet):
 
     queryset = User.objects.all()
     pagination_class = LimitOffsetPagination
-    serializer_class = UserSerializer
+    serializer_class = CustomUserSerializer
 
     @action(
         detail=True,
@@ -181,6 +162,8 @@ class CustomUserView(UserViewSet):
         author = User.objects.get(id=kwargs['id'])
         user = self.request.user
         if request.method == 'POST':
+            if author == user:
+                return Response({'errors': 'Нельзя подписаться на себя.'})
             if user.subscriptions.filter(pk=author.id).exists():
                 return Response({'errors': 'Вы уже подписаны на автора.'})
             user.subscriptions.add(author)

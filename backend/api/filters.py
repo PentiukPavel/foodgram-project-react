@@ -1,5 +1,5 @@
 from django_filters import BooleanFilter, CharFilter, FilterSet
-from foodgram.models import Recipes
+from foodgram.models import Recipe
 
 
 class RecipeFilter(FilterSet):
@@ -11,5 +11,5 @@ class RecipeFilter(FilterSet):
     in_shopping_cart = BooleanFilter(field_name='in_shopping_cart')
 
     class Meta:
-        model = Recipes
+        model = Recipe
         fields = ['author', 'tags', 'favorited', 'in_shopping_cart', ]
