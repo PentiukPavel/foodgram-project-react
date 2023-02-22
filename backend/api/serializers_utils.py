@@ -1,4 +1,6 @@
-from foodgram.models import RecipeIngredient, RecipeTag
+from django.shortcuts import get_object_or_404
+
+from foodgram.models import Ingredient, RecipeIngredient, RecipeTag
 
 
 def tags_and_ingredients_create(tags, ingredients, recipe):
@@ -10,8 +12,11 @@ def tags_and_ingredients_create(tags, ingredients, recipe):
         [RecipeTag(tag=tag, recipe=recipe) for tag in tags]
     )
     RecipeIngredient.objects.bulk_create(
-        [RecipeIngredient(ingredient=ingredient['id'],
+        [RecipeIngredient(ingredient=get_object_or_404(
+                              Ingredient,
+                              pk=ing['ingredient']['id']
+                         ),
                           recipe=recipe,
-                          amount=ingredient['amount'])
-            for ingredient in ingredients]
+                          amount=ing['amount'])
+            for ing in ingredients['all']]
     )

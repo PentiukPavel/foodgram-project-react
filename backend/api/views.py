@@ -3,12 +3,13 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from foodgram.models import Ingredient, Recipe, Tag
 from rest_framework import filters, mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+
+from foodgram.models import Ingredient, Recipe, Tag
 
 from .filters import RecipeFilter
 from .permissions import AdminAuthorOrReadOnly
@@ -41,17 +42,15 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
                     mixins.UpdateModelMixin, viewsets.GenericViewSet):
     """Вьюсет для рецептов."""
 
-
     permission_classes = (AdminAuthorOrReadOnly, )
     pagination_class = LimitOffsetPagination
     filterset_class = RecipeFilter
     filterset_fields = ('author', 'tags', 'favorited', 'in_shopping_cart',)
-    serializer_class = RecipeGetSerializer
 
     def get_serializer_class(self):
         """Выбор сериализатора для рецептов."""
 
-        if self.action in ['list', 'retrieve', ]:
+        if self.action in ['list', 'retrieve']:
             return RecipeGetSerializer
         return RecipeCreateSerializer
 
