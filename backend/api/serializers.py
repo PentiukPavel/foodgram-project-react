@@ -114,22 +114,10 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 class RicepiIngredientPostSerializer(serializers.ModelSerializer):
     """Сериализатор для получения ингредиентов рецепта и их количества."""
 
-    name = serializers.SerializerMethodField()
-    id = serializers.SerializerMethodField()
-    measurement_unit = serializers.SerializerMethodField()
-
-    class Meta:
-        model = RecipeIngredient
-        fields = ('id', 'amount', 'name', 'measurement_unit')
-
-    def get_name(self, obj):
-        return obj.ingredient.name
-
-    def get_measurement_unit(self, obj):
-        return obj.ingredient.measurement_unit
-
-    def get_id(self, obj):
-        return obj.ingredient.id
+    name = serializers.CharField(source='ingredient.name', read_only=True)
+    id = serializers.CharField(source='ingredient.id', read_only=True)
+    measurement_unit = serializers.CharField(source='measurement_unit',
+                                             read_only=True)
 
 
 class RecipeGetSerializer(serializers.ModelSerializer):
@@ -188,9 +176,9 @@ class SubscribeGetSerializer(serializers.ModelSerializer):
 
     is_subscribed = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
-    recipes = RecipeForSubscriptionsSerializer(many=True,
+    recipes = RecipeForSubscriptionsSerializer(source='recipes.all',
+                                               many=True,
                                                read_only=True)
-
 
     class Meta:
         model = User
@@ -210,12 +198,6 @@ class SubscribeGetSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         return obj.followers.filter(subscriptions=user).exists()
 
-    def get_recipes(self, obj):
-        """Получение рецептов автора."""
-
-        recipes = obj.recipes.all()
-        return RecipeForSubscriptionsSerializer(recipes, many=True)
-
     def get_recipes_count(self, obj):
         """Подсчет количества рецептов автора."""
 
@@ -223,4 +205,3 @@ class SubscribeGetSerializer(serializers.ModelSerializer):
             User,
             id=obj.id)
         return user.recipes.count()
-
