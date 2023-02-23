@@ -10,7 +10,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from foodgram.models import Ingredient, Recipe, Tag
-
 from .filters import RecipeFilter
 from .permissions import AdminAuthorOrReadOnly
 from .serializers import (CustomUserSerializer, IngredientSerializer,
