@@ -4,7 +4,6 @@ from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
 
 from foodgram.models import Ingredient, Recipe, RecipeIngredient, Tag
-
 from .fields import Base64ImageField
 from .serializers_utils import tags_and_ingredients_create
 
