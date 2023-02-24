@@ -23,4 +23,3 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/foodgram_project_react:latest
           file: backend/Dockerfile
-
