@@ -6,7 +6,9 @@ SECRET_KEY = os.getenv('SECRET', default='111')
 
 DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '158.160.46.2',
+]
 
 AUTH_USER_MODEL = 'users.User'
 
@@ -120,4 +122,4 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'backend_media')
