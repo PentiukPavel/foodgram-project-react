@@ -26,7 +26,7 @@ services:
       - db_volume:/var/lib/postgresql/data/
     env_file:
       - ./.env
-  
+
   backend:
     image:
       pavelpentiuk/foodgram_project_react:latest
