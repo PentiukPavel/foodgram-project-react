@@ -30,8 +30,6 @@ services:
   backend:
     image:
       pavelpentiuk/foodgram_project_react:latest
-    expose:
-      - 8000
     restart: always
     volumes:
       - static_value:/app/static/
