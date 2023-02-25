@@ -14,4 +14,4 @@ CMD python manage.py migrate
 
 CMD python manage.py import_csv
 
-CMD ["gunicorn", "api_yamdb.wsgi:application", "--bind", "0:8000" ] 
+CMD ["gunicorn", "backend.wsgi:application", "--bind", "0:8000" ] 
