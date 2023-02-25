@@ -5,6 +5,7 @@ services:
     build:
       context: ../frontend
       dockerfile: Dockerfile
+    restart: always
     volumes:
       - ../frontend/:/app/result_build/
 
@@ -28,7 +29,7 @@ services:
   
   backend:
     image:
-      pavelpentiuk/api_yamdb:latest
+      pavelpentiuk/foodgram_project_react:latest
     restart: always
     volumes:
       - static_value:/app/static/
