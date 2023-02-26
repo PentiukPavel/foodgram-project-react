@@ -10,7 +10,6 @@ ALLOWED_HOSTS = [
     '*'
 ]
 
-
 USE_X_FORWARDED_PORT = True
 
 AUTH_USER_MODEL = 'users.User'
