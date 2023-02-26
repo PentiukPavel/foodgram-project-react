@@ -7,7 +7,7 @@ SECRET_KEY = os.getenv('SECRET', default='111')
 DEBUG = False
 
 ALLOWED_HOSTS = [
-    '*',
+    '*'
 ]
 
 USE_X_FORWARDED_PORT = True
