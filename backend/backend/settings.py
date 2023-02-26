@@ -7,8 +7,10 @@ SECRET_KEY = os.getenv('SECRET', default='111')
 DEBUG = False
 
 ALLOWED_HOSTS = [
-    '158.160.46.2',
+    '*',
 ]
+
+USE_X_FORWARDED_PORT = True
 
 AUTH_USER_MODEL = 'users.User'
 
