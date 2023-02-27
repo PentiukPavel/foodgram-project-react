@@ -16,7 +16,6 @@ class Command(BaseCommand):
             with open(
                 os.path.join(
                     settings.BASE_DIR,
-                    '..',
                     'data',
                     'ingredients.csv'
                 ),
