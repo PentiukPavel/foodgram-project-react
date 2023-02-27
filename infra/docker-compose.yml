@@ -31,13 +31,15 @@ services:
     image:
       pavelpentiuk/foodgram_project_react:latest
     restart: always
-    command: python manage.py migrate
-    command: python manage.py collectstatic --no-input
     volumes:
       - static_value:/app/backend_static/
       - media_value:/app/backend_media/
     depends_on:
       - db
+    command:
+      exec backend python manage.py migrate
+    command:
+      exec backend python manage.py collectstatic --no-input
 
 volumes:
   postgr_volume:
