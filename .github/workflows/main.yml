@@ -37,7 +37,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
-            sudo docker compose pull ${{ secrets.DOCKER_USERNAME }}/foodgram_project_react:latest
+            sudo docker image pull ${{ secrets.DOCKER_USERNAME }}/foodgram_project_react:latest
             sudo docker compose stop
             sudo docker compose rm backend
             touch .env
