@@ -6,7 +6,7 @@ from djoser.views import UserViewSet
 from rest_framework import filters, mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from foodgram.models import Ingredient, Recipe, Tag
@@ -25,6 +25,7 @@ class TagViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    permission_classes = (AllowAny, )
 
 
 class IngredientsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -34,6 +35,7 @@ class IngredientsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = IngredientSerializer
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     search_field = ('^name',)
+    permission_classes = (AllowAny, )
 
 
 class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
