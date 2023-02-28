@@ -15,8 +15,8 @@ class RecipeFilter(FilterSet):
         user = self.request.user
         if user.is_anonymous:
             return queryset
-        return queryset.filter(pk=user.id)
+        return queryset.filter(favorited=user)
 
     class Meta:
         model = Recipe
-        fields = ['author', 'tags', 'favorited', 'in_shopping_cart', ]
+        fields = ['author', 'tags', 'is_favorited', 'is_in_shopping_cart']
