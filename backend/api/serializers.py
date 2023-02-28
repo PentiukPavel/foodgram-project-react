@@ -158,13 +158,17 @@ class RecipeGetSerializer(serializers.ModelSerializer):
         """Рецепт в списке покупок у пользователя."""
 
         user = self.context.get('request').user
-        return Recipe.objects.filter(id=obj.id, in_shopping_cart=user).exists()
+        if user.is_authenticated:
+            return Recipe.objects.filter(id=obj.id, in_shopping_cart=user).exists()
+        return False
 
     def get_is_favorited(self, obj):
         """Рецепт в избраном у пользователя."""
 
         user = self.context.get('request').user
-        return Recipe.objects.filter(id=obj.id, favorited=user).exists()
+        if user.is_authenticated:
+            return Recipe.objects.filter(id=obj.id, favorited=user).exists()
+        return False
 
 
 class RecipeForSubscriptionsSerializer(serializers.ModelSerializer):
