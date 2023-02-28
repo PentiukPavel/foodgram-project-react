@@ -7,7 +7,7 @@ from foodgram.models import Ingredient, Recipe, Tag
 class RecipeFilter(FilterSet):
     """Фильтры для рецептов."""
 
-    author = CharFilter(field_name='author__username', lookup_expr='exact')
+    author = CharFilter(field_name='author__email', lookup_expr='exact')
     tags = ModelMultipleChoiceFilter(field_name='tags__slug',
                                      to_field_name='slug',
                                      queryset=Tag.objects.all(),)
