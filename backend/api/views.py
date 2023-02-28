@@ -47,7 +47,7 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
-    filterset_fields = ('author', 'tags', 'is_favorited', 'in_shopping_cart',)
+#    filterset_fields = ('author', 'tags', 'is_favorited', 'in_shopping_cart',)
 
     def get_serializer_class(self):
         """Выбор сериализатора для рецептов."""
