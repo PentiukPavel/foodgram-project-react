@@ -57,7 +57,7 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
         return RecipeCreateSerializer
 
     def get_queryset(self):
-        if not self.kwargs['tags']:
+        if not self.request.query_params.get['tags']:
             return Recipe.objects.none()
         return Recipe.objects.all()
 
