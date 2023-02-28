@@ -1,14 +1,6 @@
 version: '3.3'
 services:
 
-#  frontend:
-#    build:
-#      context: ../frontend
-#      dockerfile: Dockerfile
-#    restart: always
-#    volumes:
-#      - ../frontend/:/app/result_build/
-
   nginx:
     image: nginx:1.19.3
     ports:
