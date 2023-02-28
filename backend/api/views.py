@@ -3,7 +3,7 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from rest_framework import filters, mixins, viewsets
+from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -33,8 +33,8 @@ class IngredientsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    search_field = ('^name',)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('^name',)
     permission_classes = (AllowAny, )
 
 
