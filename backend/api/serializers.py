@@ -24,7 +24,8 @@ class CustomUserSerializer(UserSerializer):
         """Отметка о подписке на автора."""
 
         user = self.context.get('request').user
-        return obj.followers.filter(subscriptions=user).exists()
+        return User.objects.filter(pk=user.id,
+                                   subscriptions=obj).exists()
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
