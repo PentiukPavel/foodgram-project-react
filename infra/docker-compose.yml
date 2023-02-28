@@ -36,10 +36,6 @@ services:
       - media_value:/app/backend_media/
     depends_on:
       - db
-    command:
-      exec backend python manage.py migrate
-    command:
-      exec backend python manage.py collectstatic --no-input
 
 volumes:
   postgr_volume:
