@@ -182,6 +182,7 @@ class CustomUserView(UserViewSet):
         permission_classes=(IsAuthenticated,),
         serializer_class=SubscribeGetSerializer,
         url_path='subscriptions',
+        pagination_class=LimitOffsetPagination,
     )
     def subscriptions(self, request):
         """Вывести список подписок."""
