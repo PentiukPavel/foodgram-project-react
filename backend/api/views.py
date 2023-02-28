@@ -148,7 +148,7 @@ class CustomUserView(UserViewSet):
     """Вьюсет для пользователей с пагинацией."""
 
     queryset = User.objects.all()
-    pagination_class = LimitOffsetPagination
+    pagination_class = SubscriptionPaginator
     serializer_class = CustomUserSerializer
 
     @action(
@@ -188,7 +188,6 @@ class CustomUserView(UserViewSet):
         permission_classes=(IsAuthenticated,),
         serializer_class=SubscribeGetSerializer,
         url_path='subscriptions',
-        pagination_class=SubscriptionPaginator
     )
     def subscriptions(self, request):
         """Вывести список подписок."""
