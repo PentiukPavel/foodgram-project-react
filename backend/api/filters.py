@@ -3,7 +3,7 @@ from django_filters import (CharFilter, FilterSet, ModelMultipleChoiceFilter,
 
 from foodgram.models import Ingredient, Recipe, Tag
 
-BOOLEAN_CHOICES = ((0, 'False'), (1, 'True'),)
+BOOLEAN_CHOICES = ((0, False), (1, True),)
 
 
 class RecipeFilter(FilterSet):
