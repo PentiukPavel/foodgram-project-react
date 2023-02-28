@@ -21,16 +21,16 @@ class RecipeFilter(FilterSet):
     def filter_is_favorited(self, queryset, name, value):
         """Фильтрация по наличию в избранном."""
 
-        if value:
-            user = self.request.user
+        user = self.request.user
+        if value and not user.is_anonymous:
             return queryset.filter(favorited=user)
         return queryset
 
     def filter_in_shopping_cart(self, queryset, name, value):
         """Фильтрация по наличию в списке покупок."""
 
-        if value:
-            user = self.request.user
+        user = self.request.user
+        if value and not user.is_anonymous:
             return queryset.filter(in_shopping_cart=user)
         return queryset
 
