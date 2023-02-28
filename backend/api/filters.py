@@ -12,9 +12,11 @@ class RecipeFilter(FilterSet):
                                      to_field_name='slug',
                                      queryset=Tag.objects.all(),)
     is_favorited = ModelChoiceFilter(to_field_name='favorited',
-                                     method='filter_is_favorited')
+                                     method='filter_is_favorited',
+                                     queryset=Recipe.objects.all(),)
     is_in_shopping_cart = ModelChoiceFilter(to_field_name='in_shopping_cart',
-                                            method='filter_in_shopping_cart')
+                                            method='filter_in_shopping_cart',
+                                            queryset=Recipe.objects.all(),)
 
     class Meta:
         model = Recipe
