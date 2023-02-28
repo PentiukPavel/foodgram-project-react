@@ -5,13 +5,12 @@ from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from foodgram.models import Ingredient, Recipe, Tag
 from .filters import IngredientFilter, RecipeFilter
-from .paginators import SubscriptionPaginator
+from .paginators import CustomPaginator
 from .permissions import OwnerOrReadOnly, ReadOnly
 from .serializers import (CustomUserSerializer, IngredientSerializer,
                           RecipeCreateSerializer, RecipeGetSerializer,
@@ -45,7 +44,7 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     """Вьюсет для рецептов."""
 
     permission_classes = (OwnerOrReadOnly, )
-    pagination_class = LimitOffsetPagination
+    pagination_class = CustomPaginator
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
 
@@ -148,7 +147,7 @@ class CustomUserView(UserViewSet):
     """Вьюсет для пользователей с пагинацией."""
 
     queryset = User.objects.all()
-    pagination_class = SubscriptionPaginator
+    pagination_class = CustomPaginator
     serializer_class = CustomUserSerializer
 
     @action(
