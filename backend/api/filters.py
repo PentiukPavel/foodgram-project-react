@@ -8,7 +8,7 @@ class RecipeFilter(FilterSet):
     """Фильтры для рецептов."""
 
     author = CharFilter(field_name='author__username', lookup_expr='exact')
-    tags = MultipleChoiceFilter(field_name='tags__slug', to_field_name='slug',
+    tags = MultipleChoiceFilter(field_name='tags__slug',
                                 queryset=Tag.objects.all(),)
     is_favorited = BooleanFilter(method='filter_is_favorited')
     is_in_shopping_cart = BooleanFilter(field_name='in_shopping_cart')
