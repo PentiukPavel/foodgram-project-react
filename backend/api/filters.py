@@ -1,5 +1,5 @@
 from django_filters import (BooleanFilter, CharFilter, FilterSet,
-                            MultipleChoiceFilter)
+                            ModelMultipleChoiceFilter)
 
 from foodgram.models import Recipe, Tag
 
@@ -8,7 +8,7 @@ class RecipeFilter(FilterSet):
     """Фильтры для рецептов."""
 
     author = CharFilter(field_name='author__username', lookup_expr='exact')
-    tags = MultipleChoiceFilter(field_name='tags__slug',
+    tags = ModelMultipleChoiceFilter(field_name='tags__slug',
                                 queryset=Tag.objects.all(),)
     is_favorited = BooleanFilter(method='filter_is_favorited')
     is_in_shopping_cart = BooleanFilter(field_name='in_shopping_cart')
