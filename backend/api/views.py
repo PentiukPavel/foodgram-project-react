@@ -11,6 +11,7 @@ from rest_framework.response import Response
 
 from foodgram.models import Ingredient, Recipe, Tag
 from .filters import IngredientFilter, RecipeFilter
+from .paginators import SubscriptionPaginator
 from .permissions import OwnerOrReadOnly, ReadOnly
 from .serializers import (CustomUserSerializer, IngredientSerializer,
                           RecipeCreateSerializer, RecipeGetSerializer,
@@ -187,6 +188,7 @@ class CustomUserView(UserViewSet):
         permission_classes=(IsAuthenticated,),
         serializer_class=SubscribeGetSerializer,
         url_path='subscriptions',
+        pagination_class=SubscriptionPaginator
     )
     def subscriptions(self, request):
         """Вывести список подписок."""
