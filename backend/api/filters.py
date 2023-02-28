@@ -1,7 +1,7 @@
 from django_filters import (BooleanFilter, CharFilter, FilterSet,
                             ModelMultipleChoiceFilter)
 
-from foodgram.models import Recipe, Tag
+from foodgram.models import Ingredient, Recipe, Tag
 
 
 class RecipeFilter(FilterSet):
@@ -33,3 +33,13 @@ class RecipeFilter(FilterSet):
             user = self.request.user
             return queryset.filter(in_shopping_cart=user)
         return queryset
+
+
+class IngredientFilter(FilterSet):
+    """Фильтр для ингредиентов."""
+
+    name = CharFilter(field_name='name', lookup_expr='icontains')
+
+    class Meta:
+        model = Ingredient
+        fields = ['name', ]

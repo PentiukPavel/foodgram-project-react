@@ -10,8 +10,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from foodgram.models import Ingredient, Recipe, Tag
-from .filters import RecipeFilter
-from .permissions import AdminAuthorOrReadOnly
+from .filters import IngredientFilter, RecipeFilter
+from .permissions import OwnerOrReadOnly, ReadOnly
 from .serializers import (CustomUserSerializer, IngredientSerializer,
                           RecipeCreateSerializer, RecipeGetSerializer,
                           SubscribeGetSerializer, TagSerializer)
@@ -33,8 +33,8 @@ class IngredientsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('^name',)
+    filter_backends = (DjangoFilterBackend, )
+    filterset_class = IngredientFilter
     permission_classes = (AllowAny, )
 
 
@@ -43,7 +43,7 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
                     mixins.UpdateModelMixin, viewsets.GenericViewSet):
     """Вьюсет для рецептов."""
 
-    permission_classes = (AdminAuthorOrReadOnly, )
+    permission_classes = (OwnerOrReadOnly, )
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
@@ -60,6 +60,11 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    def get_permissions(self):
+        if self.action == 'retrieve':
+            return (ReadOnly(),)
+        return super().get_permissions()
 
     @action(
         detail=True,
