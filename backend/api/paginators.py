@@ -1,7 +1,7 @@
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.pagination import PageNumberPagination
 
 
-class SubscriptionPaginator(LimitOffsetPagination):
+class SubscriptionPaginator(PageNumberPagination):
     """Кастомный пагинатор для подписок."""
 
     page_query_param = 'page'
