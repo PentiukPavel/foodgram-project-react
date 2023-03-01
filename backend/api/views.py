@@ -192,3 +192,9 @@ class SubscriptionView(UserViewSet):
     def get_queryset(self):
         user = self.request.user
         return user.subscriptions.all()
+
+    def get_serializer_contex(self):
+        limit = self.request.query_params.get('recipes_limit')
+        context = super().get_serializer_context()
+        context.update({'limit': int(limit)})
+        return context
