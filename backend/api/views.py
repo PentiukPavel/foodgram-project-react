@@ -205,4 +205,4 @@ class SubscriptionView(UserViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return user.subscriptions
+        return user.subscriptions.all()

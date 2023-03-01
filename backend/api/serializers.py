@@ -220,7 +220,7 @@ class SubscribeGetSerializer(serializers.ModelSerializer):
         return user.recipes.count()
 
     def get_recipes(self, obj):
-        """Получение рецептов"""
+        """Получение рецептов."""
 
         limit = self.context.get('request').query_params.get('recipes_limit')
         if limit is not None:
