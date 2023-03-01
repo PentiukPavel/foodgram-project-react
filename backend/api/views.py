@@ -56,9 +56,7 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
         return RecipeCreateSerializer
 
     def get_queryset(self):
-        return Recipe.objects.all().select_related('tags',
-                                                   'ingredients',
-                                                   'author')
+        return Recipe.objects.all().select_related('author')
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -124,7 +122,7 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
         """Загрузка списка покупок."""
 
         user = self.request.user
-        recipes = user.shopping_cart.all().select_related('ingredients')
+        recipes = user.shopping_cart.all()
         line_break = '\n'
         ings = Ingredient.objects.filter(recipeingredient__recipe__in=recipes)
         ing_values = ings.values(
