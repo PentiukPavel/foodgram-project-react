@@ -139,9 +139,12 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
             result.append(
                 f'{ name } - { maesurement_unit } { amount } { line_break }'
             )
-        response = HttpResponse(result, content_type='text/plain')
-        response['Content-Disposition'] = 'attachment; filename="car.txt"'
-        return response
+
+        return HttpResponse(result, headers={
+            'Content-Type': 'text/plain',
+            'Content-Disposition': 'attachment; filename="cart.txt"',
+            }
+        )
 
 
 class CustomUserView(UserViewSet):
