@@ -223,5 +223,5 @@ class SubscribeGetSerializer(serializers.ModelSerializer):
         """Получение рецептов"""
 
         limit = self.context.get('request').query_params.get('recipes_limit')
-        recipes = obj.recipes.all()[:limit]
+        recipes = obj.recipes.all()[:int(limit)]
         return RecipeForSubscriptionsSerializer(recipes, many=True)
