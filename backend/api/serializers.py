@@ -224,7 +224,7 @@ class SubscribeGetSerializer(serializers.ModelSerializer):
 
         limit = self.context.get('limit')
         if limit is not None:
-            recipes = obj.recipes.all()[:int(limit)]
+            recipes = obj.recipes.all()[:limit]
         else:
             recipes = obj.recipes.all()
         return RecipeForSubscriptionsSerializer(recipes, many=True)

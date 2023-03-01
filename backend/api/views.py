@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Sum
-from django.http import HttpResponse
+from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework import mixins, viewsets
@@ -139,10 +139,9 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
             result.append(
                 f'{ name } - { maesurement_unit } { amount } { line_break }'
             )
-        return HttpResponse(result, headers={
-            'Content-Type': 'text/plain',
-            'Content-Disposition': 'attachment; filename="cart.txt"',
-        })
+        return FileResponse(result,
+                            filename='Cart.txt',
+                            content_type='text/plain')
 
 
 class CustomUserView(UserViewSet):
@@ -194,7 +193,7 @@ class SubscriptionView(UserViewSet):
         return user.subscriptions.all()
 
     def get_serializer_contex(self):
-        limit = self.request.query_params.get('recipes_limit')
+        limit = self.request.query_params.get('recipe_limit')
         context = super().get_serializer_context()
         context.update({'limit': int(limit)})
         return context
