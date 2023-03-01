@@ -190,7 +190,7 @@ class SubscribeGetSerializer(serializers.ModelSerializer):
 
     is_subscribed = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
-    recipes = RecipeForSubscriptionsSerializer(read_only=True, many=True)
+    recipes = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -222,9 +222,11 @@ class SubscribeGetSerializer(serializers.ModelSerializer):
     def get_recipes(self, obj):
         """Получение рецептов."""
 
-        limit = self.context.get('limit')
-        if limit is not None:
-            recipes = obj.recipes.all()[:limit]
+        recipes_limit = self.context['request'].query_params.get(
+            'recipes_limit')
+
+        if recipes_limit:
+            recipes = obj.recipes.all().order_by('id')[:int(recipes_limit)]
         else:
-            recipes = obj.recipes.all()
-        return RecipeForSubscriptionsSerializer(recipes, many=True)
+            recipes = obj.recipes.all
+        return RecipeForSubscriptionsSerializer(recipes, many=True).data
