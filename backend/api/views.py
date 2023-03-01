@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Sum
-from django.http import FileResponse
+from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework import mixins, viewsets
@@ -139,11 +139,11 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
             result.append(
                 f'{ name } - { maesurement_unit } { amount } { line_break }'
             )
-        with open('Cart.txt', mode='w') as file:
-            file.write(result)
 
-        return FileResponse(file,
-                            filename='Cart.txt')
+        response = HttpResponse(result, content_type='text/plain')
+        response['Content-Disposition'] = 'attachment; filename="Cart.txt"'
+
+        return response
 
 
 class CustomUserView(UserViewSet):
