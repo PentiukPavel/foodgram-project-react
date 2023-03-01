@@ -10,6 +10,9 @@ router.register(r'ingredients',
                 views.IngredientsViewSet,
                 basename='ingredients')
 router.register(r'recipes', views.RecipeViewSet, basename='recipes')
+router.register(r'users/subscriptions',
+                views.SubscriptionView,
+                basename='subscriptions')
 router.register(r'users',
                 views.CustomUserView,
                 basename='users')
