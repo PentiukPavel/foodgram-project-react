@@ -223,5 +223,8 @@ class SubscribeGetSerializer(serializers.ModelSerializer):
         """Получение рецептов"""
 
         limit = self.context.get('request').query_params.get('recipes_limit')
-        recipes = obj.recipes.all()[:int(limit)]
+        if limit is not None:
+            recipes = obj.recipes.all()[:int(limit)]
+        else:
+            recipes = obj.recipes.all()
         return RecipeForSubscriptionsSerializer(recipes, many=True)
