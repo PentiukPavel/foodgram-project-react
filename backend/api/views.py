@@ -179,22 +179,6 @@ class CustomUserView(UserViewSet):
         serializer = self.get_serializer(author)
         return Response(serializer.data)
 
-#    @action(
-#        detail=False,
-#        methods=[
-#            'get',
-#        ],
-#        permission_classes=(IsAuthenticated,),
-#        serializer_class=SubscribeGetSerializer,
-#        url_path='subscriptions',
-#    )
-#    def subscriptions(self, request):
-#        """Вывести список подписок."""
-#        user = self.request.user
-#        subscriptions = user.subscriptions
-#        serializer = self.get_serializer(subscriptions, many=True)
-#        return Response(serializer.data)
-
 
 class SubscriptionView(UserViewSet):
     """Вьюсет для подписок пользователя."""
