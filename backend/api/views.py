@@ -56,7 +56,9 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
         return RecipeCreateSerializer
 
     def get_queryset(self):
-        return Recipe.objects.all()
+        return Recipe.objects.all().select_related('tags',
+                                                   'ingredients',
+                                                   'author')
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
