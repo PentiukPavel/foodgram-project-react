@@ -133,11 +133,11 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
                 amount=Sum('recipeingredient__amount'))
         result = []
         for value in ing_values:
-            name = value['name']
+            name = value['name'].capitalize()
             maesurement_unit = value['measurement_unit']
             amount = value['amount']
             result.append(
-                f'{ name } - { maesurement_unit } { amount } { line_break }'
+                f'{ name } ({ maesurement_unit }) - { amount } { line_break }'
             )
         return HttpResponse(result, headers={
             'Content-Type': 'text/plain',
