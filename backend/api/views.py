@@ -124,7 +124,7 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
         """Загрузка списка покупок."""
 
         user = self.request.user
-        recipes = user.shopping_cart.all()
+        recipes = user.shopping_cart.all().select_related('ingredients')
         line_break = '\n'
         ings = Ingredient.objects.filter(recipeingredient__recipe__in=recipes)
         ing_values = ings.values(
