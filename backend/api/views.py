@@ -139,9 +139,11 @@ class RecipeViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
             result.append(
                 f'{ name } - { maesurement_unit } { amount } { line_break }'
             )
-        return FileResponse(result,
-                            filename='Cart.txt',
-                            content_type='text/plain')
+        with open('Cart.txt', mode='w') as file:
+            file.write(result)
+
+        return FileResponse(file,
+                            filename='Cart.txt')
 
 
 class CustomUserView(UserViewSet):
