@@ -89,7 +89,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         result = []
         for ingredient in value:
             if ingredient in result:
-                ing_name = ingredient['id']
+                ing = ingredient['ingredient']['id']
+                ing_name = get_object_or_404(Ingredient, pk=ing).name
                 raise serializers.ValidationError(
                     f'В списке ингредиентов есть повторяющиеся: { ing_name }.'
                 )
@@ -228,5 +229,5 @@ class SubscribeGetSerializer(serializers.ModelSerializer):
         if recipes_limit:
             recipes = obj.recipes.all().order_by('id')[:int(recipes_limit)]
         else:
-            recipes = obj.recipes.all
+            recipes = obj.recipes.all()
         return RecipeForSubscriptionsSerializer(recipes, many=True).data
