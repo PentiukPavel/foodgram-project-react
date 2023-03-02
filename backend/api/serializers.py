@@ -87,7 +87,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         """Проверка уникальности ингредиентов."""
 
         result = []
-        for ingredient in value:
+        for item in value:
+            ingredient = item['ingredient']
             if ingredient in result:
                 raise serializers.ValidationError(
                     'В списке ингредиентов есть повторяющиеся элементы.'
