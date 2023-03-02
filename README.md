@@ -52,7 +52,7 @@ sudo docker compose exec backend python manage.py createsuperuser
 Заполнить базу ингредиентами:
 
 ```
-docker compose exec -T backend python manage.py import_csv 
+sudo docker compose exec -T backend python manage.py import_csv 
 ```
 
 ## Системные требования

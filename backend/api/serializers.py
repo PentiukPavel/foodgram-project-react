@@ -89,10 +89,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         result = []
         for ingredient in value:
             if ingredient in result:
-                ing = ingredient['ingredient']['id']
-                ing_name = get_object_or_404(Ingredient, pk=ing).name
                 raise serializers.ValidationError(
-                    f'В списке ингредиентов есть повторяющиеся: { ing_name }.'
+                    'В списке ингредиентов есть повторяющиеся элементы.'
                 )
             result.append(ingredient)
         return value
